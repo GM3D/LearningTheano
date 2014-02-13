@@ -1,0 +1,50 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+#*#
+*~
+*.[ao]
+*.log
+log
+*.out
+*.pro.user
+*.ptx
+*.rpo
+*.i
+*.ii
+*.cudafe1.*
+*.cudafe2.*
+*.fatbin
+*.fatbin.c
+*.cubin
+*.stub.c
+*.module_id
+*.hash
+test[0-9][A-z]
+test[0-9]
+log
+
+# gcov (gcc coverage analisys tool) files
+*.gcov
+*.gcda
+*.gcno
+
+# the executable (for test)
+challenge*-c
+*.time*
+*-cpp
+*-c
+*.txt
+bin
+encoded.data

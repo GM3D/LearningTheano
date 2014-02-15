@@ -10,15 +10,15 @@ def report(x):
     print "dtype:", x.dtype
     print "broadcastable dims:", x.broadcastable
     
-# x is float matrix
+print 'floatマトリックス'
 x = T.fmatrix()
 report(x)
 
-# x is a 32-bit integer scalar with name "myvar"
+print '名前"myvar"を持つ32-bit 整数スカラー'
 x = T.scalar('myvar', dtype='int32')
 report(x)
 
-# the same with above
+print '名前"myvar"を持つ32-bit 整数スカラー'
 x = T.iscalar('myvar')
 report(x)
 

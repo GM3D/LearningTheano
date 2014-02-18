@@ -87,3 +87,5 @@ print("debug print of %s" % 'prediction')
 print theano.printing.debugprint(prediction)
 
 print("for picture printing, see pics/logreg_pydotprint_prediction.png")
+
+

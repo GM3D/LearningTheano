@@ -68,7 +68,7 @@ print("dlogistic([[0, 1], [-1, -2]]) =\n", dlogistic([[0, 1], [-1, -2]]))
 # 一次微分係数 dy[i]/dx[j] をヤコビアンと呼んでいる。
 
 # 微分演算を用いて直接ヤコビアンを求める場合
-print("xは倍精度小数ベクター、yはx**2")
+print("xは倍精度小数ベクター、yはxの成分毎に2乗演算を適用したもの")
 
 x = T.dvector('x')
 y = x ** 2
@@ -76,9 +76,15 @@ y = x ** 2
 print("pp(x) = %s, pp(y) = %s" % (pp(x), pp(y)))
 
 
+# scanはTheanoでloopを行う演算子
+# updatesに関する詳細はLoopの章で扱う
+
 J, updates = scan(lambda i, y,x : T.grad(y[i], x), 
                   sequences=T.arange(y.shape[0]), 
                   non_sequences=[y,x])
+
 f = function([x], J, updates=updates)
 
+print("xを2次元ベクトルとして微分を計算、x = [4, 4]の点における値を求める")
 print("f([4, 4]) =\n%s" % f([4, 4]))
+

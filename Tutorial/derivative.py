@@ -86,5 +86,82 @@ J, updates = scan(lambda i, y,x : T.grad(y[i], x),
 f = function([x], J, updates=updates)
 
 print("xを2次元ベクトルとして微分を計算、x = [4, 4]の点における値を求める")
-print("f([4, 4]) =\n%s" % f([4, 4]))
+print("f([4, 4]) =\n%s\n" % f([4, 4]))
 
+# Hessianの計算
+# Hessianはtheano.gradient.hessian()を用いることで計算できる。
+# しかしここでは、理解を深めるために手動でHessianを求めてみる。
+
+# Hessianは、スカラー関数fに対して、d^2f/dx[i]dx[j]で定義される行列である。
+# したがって、本質的に、上記のヤコビアンの計算においてベクトル関数yを用いる
+# 代わりに、スカラー関数fの一階微分df/dx[i]を用いればよい。
+
+print("Hessianの計算")
+x = T.dvector('x')
+y = x ** 2
+cost = y.sum()
+# cost = x1^2 + x2^2 + ... + xn^2 のHessianを求める
+gy = T.grad(cost, x)
+H, updates = scan(lambda i, gy,x : T.grad(gy[i], x), 
+                   sequences=T.arange(gy.shape[0]),
+                   non_sequences=[gy, x])
+f = function([x], H, updates=updates)
+print("f([4, 4]) =\n %s\n" % f([4, 4]))
+
+# ヤコビアンとベクトルの乗算を用いて記述されたアルゴリズムの場合、
+# ヤコビアンを計算してからベクトルをそれに掛けるよりも効率の良い
+# 計算法がしばしば存在する。その一例が
+# Barak A. Pearlmutter, “Fast Exact Multiplication by the Hessian”, 
+# Neural Computation, 1994
+# で紹介されている方法である。
+# 本来はTheanoが自動的にそのような最適化を行ってくれることが望ましいが、
+# 実際にはそのような最適化は非常に困難なので、その代わりにそれをサポート
+# するための演算子が用意されている。
+
+# R演算子
+# R演算子は、(df(x)/dx)*vのような、ヤコビアンとベクトルの積を計算するために
+# 用意された演算子である。xは単にベクトルのみではなく、行列や、一般のテンソル
+# であってもよい。そのような場合、積も一種のテンソル積になる。
+# 実際にマシンラーニングに適用した場合、このような表式はしばしばネットワークの
+# 重み行列による微分になるため、このように一般的な積をサポートできるように設計
+# されている。
+
+print("R演算子を用いた行列*ベクトルの計算")
+W = T.dmatrix('W')
+V = T.dmatrix('V')
+x = T.dvector('x')
+y = T.dot(x, W)
+JV = T.Rop(y, W, V)
+f = function([W, V, x], JV)
+print("f([[1, 1], [1, 1]], [[2, 2], [2, 2]], [0,1]) = \n%s\n"
+      % f([[1, 1], [1, 1]], [[2, 2], [2, 2]], [0,1]))
+
+# 同様に、L演算子を用いるとベクトルv、x及びスカラー関数fに対して
+#  v * df(x)/dx を計算できる。
+print("L演算子を用いたベクトル*行列の計算")
+W = T.dmatrix('W')
+v = T.dvector('v')
+x = T.dvector('x')
+y = T.dot(x, W)
+VJ = T.Lop(y, W, v)
+f = function([v,x], VJ)
+print("f([2, 2], [0, 1]) = \n%s\n" % f([2, 2], [0, 1]))
+
+# R演算子を用いて実際にHessian*ベクトルを計算してみる
+print("R演算子を用いずベクトル*Hessianを計算する")
+x = T.dvector('x')
+v = T.dvector('v')
+y = T.sum(x ** 2)
+gy = T.grad(y, x)
+vH = T.grad(T.sum(gy * v), x)
+f = function([x, v], vH)
+print("f([4, 4], [2, 2]) = \n%s\n" % f([4, 4], [2, 2]))
+
+print("R演算子を用いてのHessian*ベクトルの計算")
+x = T.dvector('x')
+v = T.dvector('v')
+y = T.sum(x ** 2)
+gy = T.grad(y, x)
+Hv = T.Rop(gy, x, v)
+f = function([x, v], Hv)
+print("f([4, 4], [2, 2]) = \n%s\n" % f([4, 4], [2, 2]))

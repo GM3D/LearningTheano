@@ -77,8 +77,6 @@ print("pp(x) = %s\n" % pp(x))
 # 最大の係数の数は10000
 max_coeffs = 10000
 
-# Generate the components of the polynomial
-
 # 関数termは係数coefficient、次数powerのxを変数とする単項式である。
 def term(coefficient, power, x):
     return coefficient * (x ** power)
@@ -248,9 +246,36 @@ W_feedback = T.vector()
 W_out = T.vector()
 
 # for second input y, scan adds -1 in output_taps by default
-([x_vals, y_vals],updates) =\
-    theano.scan(fn = oneStep, \
-                    sequences    = dict(input = u, taps= [-4,-0]), \
-                    outputs_info = [dict(initial = x0, taps = [-3,-1]),y0], \
-                    non_sequences  = [W,W_in_1,W_in_2,W_feedback, W_out])
+# ([x_vals, y_vals],updates) =\
+#     theano.scan(fn = oneStep, \
+#                     sequences    = dict(input = u, taps= [-4,-0]), \
+#                     outputs_info = [dict(initial = x0, taps = [-3,-1]),y0], \
+#                     non_sequences  = [W,W_in_1,W_in_2,W_feedback, W_out])
 
+# Shared変数の利用 - ギッブスサンプリング
+
+
+# W_values = T.dmatrix() 
+# bvis_values = T.dvector()
+# bhid_values = T.dvector()
+
+# W = theano.shared(W_values) # we assume that ``W_values`` contains the
+#                             # initial values of your weight matrix
+
+# bvis = theano.shared(bvis_values)
+# bhid = theano.shared(bhid_values)
+
+# trng = T.shared_randomstreams.RandomStreams(1234)
+
+# def OneStep(vsample) :
+#    hmean = T.nnet.sigmoid(theano.dot(vsample, W) + bhid)
+#    hsample = trng.binomial(size=hmean.shape, n=1, p=hmean)
+#    vmean = T.nnet.sigmoid(theano.dot(hsample, W.T) + bvis)
+#    return trng.binomial(size=vsample.shape, n=1, p=vmean,
+#                         dtype=theano.config.floatX)
+
+# sample = theano.tensor.vector()
+
+# values, updates = theano.scan(OneStep, outputs_info=sample, n_steps=10)
+
+# gibbs10 = theano.function([sample], values[-1], updates=updates)

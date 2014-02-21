@@ -127,10 +127,25 @@ print("f([4, 4]) =\n %s\n" % f([4, 4]))
 # されている。
 
 print("R演算子を用いた行列*ベクトルの計算")
+print("Wは倍精度型行列")
 W = T.dmatrix('W')
+print("W = %s\n" % pp(W))
+
+print("Vは倍精度型行列")
 V = T.dmatrix('V')
+print("V = %s\n" % pp(V))
+
+print("xは倍精度型(行)ベクトル")
 x = T.dvector('x')
+print("x = %s\n" % pp(x))
+
+print("yはx, Wの行列積")
 y = T.dot(x, W)
+print("y = %s\n" % pp(y))
+
+print("JV = Rop(y, W, V)")
+print("これは、y = (x * W)のWによる微分を計算し、それにVを掛けた結果を与える。")
+print("したがってこの例では x * V に一致する")
 JV = T.Rop(y, W, V)
 f = function([W, V, x], JV)
 print("f([[1, 1], [1, 1]], [[2, 2], [2, 2]], [0,1]) = \n%s\n"
@@ -139,29 +154,76 @@ print("f([[1, 1], [1, 1]], [[2, 2], [2, 2]], [0,1]) = \n%s\n"
 # 同様に、L演算子を用いるとベクトルv、x及びスカラー関数fに対して
 #  v * df(x)/dx を計算できる。
 print("L演算子を用いたベクトル*行列の計算")
+print("Wは倍精度型行列")
 W = T.dmatrix('W')
+print("W = %s\n" % pp(W))
+
+print("vは倍精度型(行)ベクトル")
 v = T.dvector('v')
+print("v = %s\n" % pp(v))
+
+print("xは倍精度型(列)ベクトル")
 x = T.dvector('x')
+print("x = %s\n" % pp(x))
+
+print("yはx, Wの行列積")
 y = T.dot(x, W)
+print("y = %s\n" % pp(y))
+
+print("VJ = Lop(y, W, v)")
+print("これは、y = (x * W)のWによる微分を計算し、それにvを左から掛けた結果を与える。")
+print("したがってこの例では v * xのテンソル積(行列)に一致する")
+
 VJ = T.Lop(y, W, v)
+print("VJ = %s\n" % pp(VJ))
+
 f = function([v,x], VJ)
 print("f([2, 2], [0, 1]) = \n%s\n" % f([2, 2], [0, 1]))
 
 # R演算子を用いて実際にHessian*ベクトルを計算してみる
 print("R演算子を用いずベクトル*Hessianを計算する")
+print("xは倍精度型(列)ベクトル")
 x = T.dvector('x')
+print("x = %s\n" % pp(x))
+
+print("vは倍精度型(行)ベクトル")
 v = T.dvector('v')
+print("v = %s\n" % pp(v))
+
+print("y = x^2 = x1^2 + x2^2 + ... + xn^2")
 y = T.sum(x ** 2)
+print("y = %s\n" % pp(y))
+
 gy = T.grad(y, x)
+print("gy = dy / dx = %s\n" % pp(gy))
+
 vH = T.grad(T.sum(gy * v), x)
+print("VHはv * H (pp()の結果は長いので略。vの乗算は右からでも左からでもどちらと解釈してもよい)")
+
 f = function([x, v], vH)
-print("f([4, 4], [2, 2]) = \n%s\n" % f([4, 4], [2, 2]))
+print("実行時関数f()を定義")
+print("このケースでは、Hessianは単にxのサイズと同じ縦横のサイズをもつ単位行列の2倍なので、vを演算すると単純にvが2倍される")
+print("f([4, 4], [2, 2]) = %s\n" % f([4, 4], [2, 2]))
 
 print("R演算子を用いてのHessian*ベクトルの計算")
+print("xは倍精度型(列)ベクトル")
 x = T.dvector('x')
+print("x = %s\n" % pp(x))
+
+print("vは倍精度型(行)ベクトル")
 v = T.dvector('v')
+print("v = %s\n" % pp(v))
+
+print("y = x^2 = x1^2 + x2^2 + ... + xn^2")
 y = T.sum(x ** 2)
+print("y = %s\n" % pp(y))
+
 gy = T.grad(y, x)
+print("gy = dy / dx = %s\n" % pp(gy))
+
 Hv = T.Rop(gy, x, v)
+print("Hv = Rop(gy, x, v) (pretty printの結果は長い)")
+
+print("f = function([x, v], Hv)")
 f = function([x, v], Hv)
-print("f([4, 4], [2, 2]) = \n%s\n" % f([4, 4], [2, 2]))
+print("f([4, 4], [2, 2]) = %s\n" % f([4, 4], [2, 2]))
